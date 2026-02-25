@@ -41,7 +41,7 @@ export default function Numeros() {
   function tempoRestante(expiraEm?: number | null) {
     if (!expiraEm) return "05:00";
     const diff = expiraEm - agora;
-    if (diff <= 0) return "Expirado";
+    if (diff <= 0) return "00:00";
     const min = Math.floor(diff / 60000);
     const seg = Math.floor((diff % 60000) / 1000);
     return `${min.toString().padStart(2, "0")}:${seg.toString().padStart(2, "0")}`;
