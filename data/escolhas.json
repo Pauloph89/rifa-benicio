@@ -1,0 +1,20 @@
+[
+  {
+    "numero": 7,
+    "nome": "PAULO",
+    "telefone": "81981120162",
+    "email": "",
+    "tipoEntrega": "pix",
+    "status": "pendente_pix",
+    "data": "2026-02-22T06:10:34.995Z"
+  },
+  {
+    "numero": 3,
+    "nome": "´PAULO",
+    "telefone": "81981120162",
+    "email": "",
+    "tipoEntrega": "presencial",
+    "status": "presencial_pendente",
+    "data": "2026-02-22T06:19:13.123Z"
+  }
+]
