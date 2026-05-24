@@ -7,11 +7,10 @@ import { carregarParticipantes, Participante } from "@/services/storage";
 
 type Fase = "carregando" | "pronto" | "sorteando" | "resultado";
 
-const SENHA_MESTRE = "benicio2026";
-
 export default function Sorteio() {
   const [autenticado, setAutenticado] = useState(false);
   const [senhaInput, setSenhaInput] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
   const [participantes, setParticipantes] = useState<Participante[]>([]);
   const [fase, setFase] = useState<Fase>("carregando");
   const [exibindo, setExibindo] = useState<Participante | null>(null);
@@ -33,9 +32,16 @@ export default function Sorteio() {
     }
   }, [autenticado]);
 
-  function fazerLogin(e: React.FormEvent) {
+  async function fazerLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (senhaInput === SENHA_MESTRE) setAutenticado(true);
+    setLoginLoading(true);
+    const res = await fetch("/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ senha: senhaInput }),
+    });
+    setLoginLoading(false);
+    if (res.ok) setAutenticado(true);
     else alert("Senha incorreta! ❌");
   }
 
@@ -72,6 +78,7 @@ export default function Sorteio() {
   }
 
   function reiniciar() {
+    if (!confirm("Tem certeza que deseja sortear novamente? O resultado atual será perdido.")) return;
     setVencedor(null);
     setExibindo(null);
     setFase("pronto");
@@ -94,8 +101,8 @@ export default function Sorteio() {
             className="w-full p-5 mb-4 rounded-2xl bg-gray-50 border-2 border-gray-100 outline-none text-center font-bold text-gray-900 focus:border-blue-400 transition-all"
             placeholder="Senha Mestra"
           />
-          <button type="submit" className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">
-            Entrar
+          <button type="submit" disabled={loginLoading} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all disabled:opacity-60">
+            {loginLoading ? "Verificando..." : "Entrar"}
           </button>
         </form>
       </main>

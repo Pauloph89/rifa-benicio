@@ -17,6 +17,16 @@ function salvarArquivo(dados: any) {
   fs.writeFileSync(filePath, JSON.stringify(dados, null, 2));
 }
 
+function origemPermitida(req: Request) {
+  const origin = req.headers.get("origin") ?? "";
+  const host = req.headers.get("host") ?? "";
+  return (
+    origin.includes("rifa-benicio.vercel.app") ||
+    origin.includes("localhost") ||
+    host.includes("localhost")
+  );
+}
+
 /* =========================
    BUSCAR PARTICIPANTES
 ========================= */
@@ -29,12 +39,24 @@ export async function GET() {
    SALVAR NOVA ESCOLHA
 ========================= */
 export async function POST(req: Request) {
+  if (!origemPermitida(req)) {
+    return NextResponse.json({ erro: "Não autorizado" }, { status: 403 });
+  }
+
   const body = await req.json();
+
+  if (!body.numero || !body.nome || !body.telefone) {
+    return NextResponse.json({ erro: "Dados incompletos" }, { status: 400 });
+  }
 
   const escolhas = lerArquivo();
 
-  escolhas.push(body);
+  const jaExiste = escolhas.some((p: any) => p.numero === body.numero);
+  if (jaExiste) {
+    return NextResponse.json({ erro: "Número já reservado" }, { status: 409 });
+  }
 
+  escolhas.push(body);
   salvarArquivo(escolhas);
 
   return NextResponse.json({ ok: true });
@@ -44,7 +66,15 @@ export async function POST(req: Request) {
    ATUALIZAR STATUS
 ========================= */
 export async function PUT(req: Request) {
+  if (!origemPermitida(req)) {
+    return NextResponse.json({ erro: "Não autorizado" }, { status: 403 });
+  }
+
   const body = await req.json();
+
+  if (!body.numero || !body.status) {
+    return NextResponse.json({ erro: "Dados incompletos" }, { status: 400 });
+  }
 
   const escolhas = lerArquivo();
 

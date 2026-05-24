@@ -14,57 +14,49 @@ export default function Admin() {
   const [participantes, setParticipantes] = useState<Participante[]>([]);
   const [autenticado, setAutenticado] = useState(false);
   const [senhaInput, setSenhaInput] = useState("");
-  const SENHA_MESTRE = "benicio2026"; 
-
-  // Função para buscar dados atualizados do Supabase
-  async function atualizarLista() {
-    const dados = await carregarParticipantes();
-    setParticipantes(dados);
-  }
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loadingNumero, setLoadingNumero] = useState<number | null>(null);
+  const [busca, setBusca] = useState("");
 
   useEffect(() => {
     if (!autenticado) return;
     carregarParticipantes().then(setParticipantes);
   }, [autenticado]);
 
-  function fazerLogin(e: React.FormEvent) {
+  async function fazerLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (senhaInput === SENHA_MESTRE) {
-      setAutenticado(true);
-    } else {
-      alert("Senha incorreta! ❌");
-    }
+    setLoginLoading(true);
+    const res = await fetch("/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ senha: senhaInput }),
+    });
+    setLoginLoading(false);
+    if (res.ok) setAutenticado(true);
+    else alert("Senha incorreta! ❌");
   }
 
-  // Confirma o recebimento do PIX ou da Fralda
   async function confirmarReserva(participante: Participante) {
+    setLoadingNumero(participante.numero);
     const novoStatus = participante.tipoEntrega === 'pix' ? 'confirmado_pix' : 'entregue';
-    
-    const atualizado: Participante = { 
-      ...participante, 
-      status: novoStatus, 
-      expiraEm: null 
-    };
-
-    await salvarParticipantes([atualizado]);
-    await atualizarLista();
+    await salvarParticipantes([{ ...participante, status: novoStatus, expiraEm: null }]);
+    const dados = await carregarParticipantes();
+    setParticipantes(dados);
+    setLoadingNumero(null);
     alert(`Número ${participante.numero} confirmado com sucesso! ✅`);
   }
 
-  // Remove a reserva do banco de dados definitivamente
   async function excluirReserva(numero: number) {
-    if (confirm(`Tem certeza que deseja excluir a reserva do número ${numero}?`)) {
-      const { error } = await supabase
-        .from('participantes')
-        .delete()
-        .eq('numero', numero);
-
-      if (!error) {
-        await atualizarLista();
-      } else {
-        alert("Erro ao excluir do banco de dados.");
-      }
+    if (!confirm(`Tem certeza que deseja excluir a reserva do número ${numero}?`)) return;
+    setLoadingNumero(numero);
+    const { error } = await supabase.from('participantes').delete().eq('numero', numero);
+    if (!error) {
+      const dados = await carregarParticipantes();
+      setParticipantes(dados);
+    } else {
+      alert("Erro ao excluir do banco de dados.");
     }
+    setLoadingNumero(null);
   }
 
   // --- TELA DE LOGIN ---
@@ -84,8 +76,8 @@ export default function Admin() {
             className="w-full p-5 mb-4 rounded-2xl bg-gray-50 border-2 border-gray-100 outline-none text-center font-bold text-gray-900 focus:border-blue-400 transition-all" 
             placeholder="Senha Mestra" 
           />
-          <button type="submit" className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">
-            Entrar no Painel
+          <button type="submit" disabled={loginLoading} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all disabled:opacity-60">
+            {loginLoading ? "Verificando..." : "Entrar no Painel"}
           </button>
         </form>
       </main>
@@ -160,12 +152,23 @@ export default function Admin() {
 
         {/* LISTA DE RESERVAS */}
         <div className="space-y-4">
-          <h2 className="text-xs font-black text-gray-900 uppercase tracking-[0.3em] ml-4 mb-4 flex items-center gap-2">
-            <Users size={16} /> Lista de Reservas Ativas
-          </h2>
-          
+          <div className="flex items-center justify-between mb-4 ml-1 mr-1 gap-4">
+            <h2 className="text-xs font-black text-gray-900 uppercase tracking-[0.3em] flex items-center gap-2 shrink-0">
+              <Users size={16} /> Lista de Reservas Ativas
+            </h2>
+            <input
+              type="text"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder="Buscar por nome..."
+              className="bg-white border border-gray-100 rounded-2xl px-4 py-2 text-sm font-bold text-gray-700 outline-none focus:border-blue-300 transition-all shadow-sm w-48"
+            />
+          </div>
+
           {participantes.length > 0 ? (
-            participantes.sort((a,b) => a.numero - b.numero).map((p) => (
+            participantes
+              .filter(p => p.nome.toLowerCase().includes(busca.toLowerCase()))
+              .sort((a,b) => a.numero - b.numero).map((p) => (
               <div key={p.numero} className="flex items-center gap-4 bg-white p-5 md:p-7 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all group">
                 {/* Número do Cartão */}
                 <span className="bg-blue-600 text-white w-16 h-14 flex items-center justify-center rounded-2xl font-black text-xl shrink-0 shadow-lg shadow-blue-100 group-hover:scale-110 transition-transform">
@@ -192,24 +195,23 @@ export default function Admin() {
 
                 {/* Botões de Ação */}
                 <div className="flex gap-2">
-                  {/* Confirmar */}
                   {!(p.status === 'confirmado_pix' || p.status === 'entregue') && (
-                    <button 
+                    <button
                       onClick={() => confirmarReserva(p)}
-                      className="p-4 bg-green-50 text-green-600 rounded-2xl hover:bg-green-600 hover:text-white transition-all shadow-sm"
-                      title="Confirmar"
+                      disabled={loadingNumero === p.numero}
+                      className="p-4 bg-green-50 text-green-600 rounded-2xl hover:bg-green-600 hover:text-white transition-all shadow-sm disabled:opacity-50"
+                      aria-label="Confirmar entrega"
                     >
-                      <CheckCircle size={24} />
+                      {loadingNumero === p.numero ? <span className="text-xs font-black">...</span> : <CheckCircle size={24} />}
                     </button>
                   )}
-                  
-                  {/* Excluir */}
-                  <button 
+                  <button
                     onClick={() => excluirReserva(p.numero)}
-                    className="p-4 bg-red-50 text-red-600 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm"
-                    title="Excluir"
+                    disabled={loadingNumero === p.numero}
+                    className="p-4 bg-red-50 text-red-600 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-sm disabled:opacity-50"
+                    aria-label="Excluir reserva"
                   >
-                    <Trash2 size={24} />
+                    {loadingNumero === p.numero ? <span className="text-xs font-black">...</span> : <Trash2 size={24} />}
                   </button>
                 </div>
               </div>

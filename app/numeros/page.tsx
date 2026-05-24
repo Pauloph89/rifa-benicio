@@ -56,14 +56,24 @@ export default function Numeros() {
   };
 
   const finalizarReserva = async (tipo: 'presencial' | 'pix', valorFinal: number) => {
+    // Verifica se o número ainda está livre antes de reservar
+    const dadosAtuais = await carregarParticipantes();
+    const jaTomado = dadosAtuais.find(p => p.numero === numeroSelecionado);
+    if (jaTomado) {
+      alert("Ops! Esse número acabou de ser reservado por outra pessoa. Escolha outro 😊");
+      setParticipantes(dadosAtuais);
+      fecharModal();
+      return;
+    }
+
     const novo: Participante = {
       numero: numeroSelecionado!,
       nome: nome.toUpperCase(),
       telefone,
       tipoEntrega: tipo,
       status: tipo === 'pix' ? 'pendente_pix' : 'presencial_pendente',
-      data: new Date().toISOString(),
-      expiraEm: tipo === 'pix' ? Date.now() + 5 * 60 * 1000 : null, // Ajustado para 5 minutos
+      data: new Date(agora).toISOString(),
+      expiraEm: tipo === 'pix' ? agora + 5 * 60 * 1000 : null,
       valor: valorFinal
     };
 
@@ -207,7 +217,7 @@ export default function Numeros() {
                   <p className="font-black text-gray-900 text-xl mb-4 uppercase">072.671.944-78</p>
                   
                   <div className="bg-white py-2 px-6 rounded-full inline-block border border-red-200 mb-6">
-                    <p className="text-[10px] font-black text-red-600 uppercase">⏱️ EXPIRA EM: {tempoRestante(Date.now() + 5 * 60 * 1000)}</p>
+                    <p className="text-[10px] font-black text-red-600 uppercase">⏱️ EXPIRA EM: {tempoRestante(agora + 5 * 60 * 1000)}</p>
                   </div>
                   
                   <div className="grid grid-cols-1 gap-3 text-gray-900">

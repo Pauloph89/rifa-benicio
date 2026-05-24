@@ -39,7 +39,7 @@ export async function salvarParticipantes(participantes: Participante[]) {
   }
 }
 
-// --- CARREGAR (Busca a lista completa do banco) ---
+// --- CARREGAR (Busca a lista e limpa reservas PIX expiradas) ---
 export async function carregarParticipantes(): Promise<Participante[]> {
   const { data, error } = await supabase
     .from('participantes')
@@ -49,6 +49,21 @@ export async function carregarParticipantes(): Promise<Participante[]> {
     console.error('Erro ao buscar dados:', error.message);
     return [];
   }
-  
+
+  const agora = Date.now();
+  const expirados = (data || []).filter(
+    (p) => p.status === 'pendente_pix' && p.expiraEm && p.expiraEm < agora
+  );
+
+  if (expirados.length > 0) {
+    const numerosExpirados = expirados.map((p) => p.numero);
+    await supabase
+      .from('participantes')
+      .delete()
+      .in('numero', numerosExpirados);
+
+    return (data || []).filter((p) => !numerosExpirados.includes(p.numero));
+  }
+
   return data || [];
 }
