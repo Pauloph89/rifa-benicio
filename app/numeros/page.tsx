@@ -103,41 +103,41 @@ export default function Numeros() {
     <main className="min-h-screen bg-blue-50 p-4 md:p-8 font-sans pb-20">
       <div className="max-w-5xl mx-auto">
         
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-4">
           <Link href="/"><button className="bg-white p-3 rounded-full shadow-sm text-gray-400 hover:scale-110 transition hover:text-blue-600"><ArrowLeft size={20} /></button></Link>
-          <h1 className="text-2xl md:text-4xl font-black text-blue-700 uppercase tracking-tighter">Chá Rifa do Benício 💙</h1>
+          <h1 className="text-lg md:text-3xl font-black text-blue-700 uppercase tracking-tighter text-center leading-tight">Chá Rifa do Benício 💙</h1>
           <div className="w-10"></div>
         </div>
 
         {/* Banner do Mimo */}
-        <div className="bg-white p-6 rounded-[2.5rem] shadow-sm mb-8 border border-blue-100 flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
-          <div className="bg-blue-600 p-4 rounded-3xl text-white shadow-lg shadow-blue-100 animate-pulse">
-            <Gift size={32} />
+        <div className="bg-white p-3 md:p-6 rounded-[2rem] shadow-sm mb-4 border border-blue-100 flex flex-row items-center gap-3">
+          <div className="bg-blue-600 p-3 rounded-2xl text-white shadow-lg shadow-blue-100 shrink-0">
+            <Gift size={20} />
           </div>
           <div>
-            <h3 className="text-blue-700 font-black uppercase text-sm md:text-base leading-tight">Cada número reservado representa:</h3>
-            <p className="text-gray-900 font-bold text-xs md:text-sm uppercase tracking-tight">1 Pacote de Fralda (tamanho indicado) + 1 Mimo para o Benício 🎁</p>
+            <h3 className="text-blue-700 font-black uppercase text-xs leading-tight">Cada número representa:</h3>
+            <p className="text-gray-700 font-bold text-[10px] uppercase tracking-tight">1 Pacote de Fralda + 1 Mimo para o Benício 🎁</p>
           </div>
         </div>
 
         {/* Legenda */}
-        <div className="flex flex-wrap justify-center gap-6 mb-10 bg-white p-6 rounded-[2.5rem] shadow-sm border border-blue-100">
-          <div className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-            <div className="w-5 h-5 rounded-lg bg-white border-2 border-gray-100"></div> Livre
+        <div className="flex flex-wrap justify-center gap-3 mb-4 bg-white p-3 rounded-[2rem] shadow-sm border border-blue-100">
+          <div className="flex items-center gap-1.5 text-[9px] font-black text-gray-500 uppercase tracking-widest">
+            <div className="w-4 h-4 rounded-md bg-white border-2 border-gray-100"></div> Livre
           </div>
-          <div className="flex items-center gap-2 text-[10px] font-black text-yellow-600 uppercase tracking-widest">
-            <div className="w-5 h-5 rounded-lg bg-yellow-400"></div> Pendente
+          <div className="flex items-center gap-1.5 text-[9px] font-black text-yellow-600 uppercase tracking-widest">
+            <div className="w-4 h-4 rounded-md bg-yellow-400"></div> Pendente
           </div>
-          <div className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest">
-            <div className="w-5 h-5 rounded-lg bg-blue-500"></div> Confirmado
+          <div className="flex items-center gap-1.5 text-[9px] font-black text-blue-600 uppercase tracking-widest">
+            <div className="w-4 h-4 rounded-md bg-blue-500"></div> Confirmado
           </div>
-          <div className="flex items-center gap-2 text-[10px] font-black text-green-600 uppercase tracking-widest">
-            <div className="w-5 h-5 rounded-lg bg-green-500"></div> Entregue
+          <div className="flex items-center gap-1.5 text-[9px] font-black text-green-600 uppercase tracking-widest">
+            <div className="w-4 h-4 rounded-md bg-green-500"></div> Entregue
           </div>
         </div>
 
         {/* Grid de Números */}
-        <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-10 gap-3 mb-16">
+        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 mb-16">
           {Array.from({ length: 150 }, (_, i) => i + 1).map((num) => {
             const p = participantes.find(part => part.numero === num);
             let cor = "bg-white text-gray-900 border-gray-100";
@@ -146,9 +146,9 @@ export default function Numeros() {
             if (p?.status === 'entregue') cor = "bg-green-500 text-white border-green-500";
 
             return (
-              <button key={num} onClick={() => handleSelecionarNumero(num)} className={`rounded-2xl border-2 p-3 text-center transition-all shadow-sm ${cor} ${!p && 'hover:scale-110 hover:border-blue-300 hover:shadow-xl'}`}>
-                <p className="text-lg md:text-xl font-black mb-1">{num.toString().padStart(3, '0')}</p>
-                <p className="text-[7px] md:text-[8px] uppercase font-black leading-tight">Fralda {gerarTamanho(num)}<br/>+ Mimo</p>
+              <button key={num} onClick={() => handleSelecionarNumero(num)} className={`rounded-xl border-2 p-1.5 md:p-3 text-center transition-all shadow-sm ${cor} ${!p && 'hover:scale-110 hover:border-blue-300 hover:shadow-xl'}`}>
+                <p className="text-sm md:text-xl font-black mb-0.5">{num.toString().padStart(3, '0')}</p>
+                <p className="text-[6px] md:text-[8px] uppercase font-black leading-tight">{gerarTamanho(num)}<br/>+Mimo</p>
               </button>
             );
           })}

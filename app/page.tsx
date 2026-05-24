@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, Baby, Gift, Calendar, Users, Volume2, VolumeX } from "lucide-react";
+import { Heart, Gift, Calendar, Users, Volume2, VolumeX } from "lucide-react";
 import { useState, useRef } from "react";
 
 export default function Home() {
@@ -10,69 +10,88 @@ export default function Home() {
 
   const alternarMusica = () => {
     if (audioRef.current) {
-      if (tocando) { audioRef.current.pause(); } 
+      if (tocando) { audioRef.current.pause(); }
       else { audioRef.current.play(); }
       setTocando(!tocando);
     }
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-blue-50 p-6 font-sans">
+    <main className="h-screen overflow-hidden flex flex-col items-center justify-between bg-blue-50 px-4 py-4 font-sans relative">
       <audio ref={audioRef} loop>
         <source src="/musica-tema.mp3" type="audio/mpeg" />
       </audio>
 
-      <button onClick={alternarMusica} className="fixed top-5 right-5 bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-md text-blue-500 z-50">
-        {tocando ? <Volume2 size={20} /> : <VolumeX size={20} />}
+      <button onClick={alternarMusica} className="fixed top-4 right-4 bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-md text-blue-500 z-50">
+        {tocando ? <Volume2 size={18} /> : <VolumeX size={18} />}
       </button>
 
-      <div className="bg-white p-8 md:p-12 rounded-[3rem] shadow-xl shadow-blue-100 max-w-2xl w-full text-center border border-blue-100 animate-in fade-in zoom-in duration-700">
-        <div className="relative w-32 h-32 md:w-48 md:h-48 mx-auto mb-8 bg-gray-50 rounded-full border-4 border-white shadow-2xl overflow-hidden flex items-center justify-center">
-          <Image src="/familiaa.jpg" alt="Família" fill className="object-contain p-2" priority />
+      {/* CARD PRINCIPAL */}
+      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-blue-100 w-full max-w-lg border border-blue-100 flex flex-col items-center px-6 py-5 gap-3 flex-1 justify-between mt-2">
+
+        {/* FOTO + TÍTULO */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-blue-100 shadow-xl overflow-hidden bg-gray-50 flex-shrink-0">
+            <Image src="/familiaa.jpg" alt="Família" fill className="object-contain p-1" priority />
+          </div>
+          <div className="text-center">
+            <h1 className="text-2xl md:text-4xl font-black text-blue-700 tracking-tighter uppercase leading-tight">
+              O Benício está chegando! 💙
+            </h1>
+          </div>
         </div>
 
-        <h1 className="text-3xl md:text-5xl font-black text-blue-700 mb-6 tracking-tighter uppercase">
-          O Benício está chegando! 💙
-        </h1>
-
-        <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-10 font-medium">
-          Nossa família está crescendo e o coração transborda gratidão! O Benício já é muito amado e mal podemos esperar para ver seu rostinho. Preparamos este chá rifa para que cada um de vocês possa fazer parte da nossa história. 
-          <br /><br />
-          Escolha seus números, concorra a <span className="text-green-600 font-black">R$ 150,00</span> e venha celebrar essa espera com a gente!
+        {/* TEXTO */}
+        <p className="text-sm md:text-base text-gray-600 leading-relaxed text-center font-medium px-1">
+          Nossa família está crescendo e o coração transborda gratidão! Escolha seus números, concorra a{" "}
+          <span className="text-green-600 font-black">R$ 150,00</span> e venha celebrar essa espera com a gente!
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10 text-left">
-          <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex items-start gap-3">
-            <Calendar className="text-blue-500 shrink-0" size={20} />
+        {/* DATAS */}
+        <div className="grid grid-cols-2 gap-3 w-full">
+          <div className="bg-blue-50 p-3 rounded-2xl border border-blue-100 flex items-center gap-2">
+            <Calendar className="text-blue-500 shrink-0" size={18} />
             <div>
-              <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Entrega das Fraldas</p>
-              <p className="text-sm font-bold text-blue-900">Até 06/06/2026</p>
+              <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Entrega da Fralda</p>
+              <p className="text-xs font-black text-blue-900">Até 06/06/2026</p>
             </div>
           </div>
-          <div className="bg-green-50 p-4 rounded-2xl border border-green-100 flex items-start gap-3">
-            <Gift className="text-green-500 shrink-0" size={20} />
+          <div className="bg-green-50 p-3 rounded-2xl border border-green-100 flex items-center gap-2">
+            <Gift className="text-green-500 shrink-0" size={18} />
             <div>
-              <p className="text-[10px] font-black text-green-400 uppercase tracking-widest">Sorteio do Prêmio</p>
-              <p className="text-sm font-bold text-green-900">Dia 13/06/2026</p>
+              <p className="text-[9px] font-black text-green-400 uppercase tracking-widest">Sorteio do Prêmio</p>
+              <p className="text-xs font-black text-green-900">Dia 13/06/2026</p>
             </div>
           </div>
         </div>
 
-        <Link href="/numeros">
-          <button className="group relative w-full bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-[2rem] text-lg font-black uppercase tracking-widest shadow-2xl shadow-blue-200 transition-all hover:scale-105">
-            <span className="flex items-center justify-center gap-2">
-              Escolher meus números <Heart size={20} className="fill-white animate-pulse" />
-            </span>
-          </button>
+        {/* BOTÃO PRINCIPAL */}
+        <div className="w-full flex flex-col items-center gap-1">
+          <Link href="/numeros" className="w-full">
+            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-[2rem] font-black uppercase tracking-widest shadow-2xl shadow-blue-200 transition-all hover:scale-105 flex items-center justify-center gap-2 text-base md:text-lg animate-pulse">
+              Escolher meus números <Heart size={20} className="fill-white" />
+            </button>
+          </Link>
+          <p className="text-blue-400 text-[11px] font-black uppercase tracking-widest animate-bounce">
+            👆 Clique aqui para participar!
+          </p>
+        </div>
+
+        {/* TROCAR NÚMERO */}
+        <Link href="/trocar">
+          <p className="text-blue-300 text-[10px] font-bold underline underline-offset-2 hover:text-blue-500 transition-colors text-center">
+            Já escolheu um número? Clique aqui para trocar
+          </p>
         </Link>
       </div>
 
-      <footer className="mt-12 text-center pb-10">
-        <p className="text-blue-500 font-medium italic text-sm mb-4 flex items-center justify-center gap-2">
-          Organizado com carinho por Papai, Mamãe e Tata <Users size={16} />
+      {/* FOOTER */}
+      <footer className="py-3 text-center">
+        <p className="text-blue-500 font-medium italic text-xs flex items-center justify-center gap-1">
+          Organizado com carinho por Papai, Mamãe e Tata <Users size={14} />
         </p>
         <Link href="/admin">
-          <button className="text-[10px] font-black text-blue-300 hover:text-blue-600 uppercase tracking-[0.3em]">
+          <button className="text-[9px] font-black text-blue-300 hover:text-blue-600 uppercase tracking-[0.3em] mt-1">
             Painel Administrativo
           </button>
         </Link>
