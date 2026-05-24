@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Trash2, CheckCircle, Heart, Lock, Users, DollarSign } from "lucide-react";
-import { ExternalLink } from "lucide-react";
+import { ArrowLeft, Trash2, CheckCircle, Heart, Lock, Users, Trophy, ExternalLink } from "lucide-react";
 import {
   carregarParticipantes,
   salvarParticipantes,
@@ -23,11 +22,9 @@ export default function Admin() {
     setParticipantes(dados);
   }
 
-  // Só busca os dados se o usuário estiver autenticado
   useEffect(() => {
-    if (autenticado) {
-      atualizarLista();
-    }
+    if (!autenticado) return;
+    carregarParticipantes().then(setParticipantes);
   }, [autenticado]);
 
   function fazerLogin(e: React.FormEvent) {
@@ -110,11 +107,18 @@ export default function Admin() {
           <h1 className="text-2xl md:text-3xl font-black text-center flex items-center gap-3 uppercase tracking-tighter text-gray-800">
             Gestão Benício <Heart size={28} className="text-blue-500 fill-blue-500" />
           </h1>
-          <Link href="/banner" target="_blank">
-            <button className="bg-blue-600 text-white px-4 py-3 rounded-2xl shadow-sm hover:bg-blue-700 transition-all hover:scale-105 flex items-center gap-2 text-xs font-black uppercase tracking-wide">
-              <ExternalLink size={16} /> Banner
-            </button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/sorteio">
+              <button className="bg-yellow-400 text-white px-4 py-3 rounded-2xl shadow-sm hover:bg-yellow-500 transition-all hover:scale-105 flex items-center gap-2 text-xs font-black uppercase tracking-wide">
+                <Trophy size={16} /> Sorteio
+              </button>
+            </Link>
+            <Link href="/banner" target="_blank">
+              <button className="bg-blue-600 text-white px-4 py-3 rounded-2xl shadow-sm hover:bg-blue-700 transition-all hover:scale-105 flex items-center gap-2 text-xs font-black uppercase tracking-wide">
+                <ExternalLink size={16} /> Banner
+              </button>
+            </Link>
+          </div>
         </div>
 
         {/* RESUMO DE ARRECADAÇÃO E NÚMEROS */}
